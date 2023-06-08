@@ -2,46 +2,41 @@ module Main where
 
 import Options.Applicative
 
-data Sample = Sample
-  { hello      :: String
-  , quiet      :: Bool
-  , enthusiasm :: Int
+data Options = Options
+  { optDeploy :: String,
+    optInit :: String
   }
+-- data Input
+--   = DeployInput
+--   | InitInput
 
-sample :: Parser Sample
-sample =
-  Sample
+opts :: Parser Options
+opts =
+  Options
     <$> strOption
-      ( long "hello"
+      ( long "deploy"
           <> metavar "TARGET"
-          <> help "Target for the greeting"
+          <> help "Deploy code"
       )
-    <*> switch
-      ( long "quiet"
-          <> short 'q'
-          <> help "Whether to be quiet"
-      )
-    <*> option
-      auto
-      ( long "enthusiasm"
-          <> help "How enthusiastically to greet"
-          <> showDefault
-          <> value 1
-          <> metavar "INT"
+    <*> strOption
+      ( long "init"
+          <> metavar "TEMPLATE"
+          <> help "Codegen starter template"
       )
 
 main :: IO ()
-main = greet =<< execParser opts
+main = greet =<< execParser opts'
   where
-    opts =
+    opts' =
       info
-        (sample <**> helper)
+        (opts <**> helper)
         ( fullDesc
             <> progDesc "Print a greeting for TARGET"
             <> header "hello - a test for optparse-applicative"
         )
 
-greet :: Sample -> IO ()
-greet (Sample h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
-greet _ = return ()
+greet :: Options -> IO ()
+greet _ = putStrLn $ "Hello!"
+-- greet (Options h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
+-- greet _ = return ()
 
