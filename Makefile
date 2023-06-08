@@ -54,7 +54,7 @@ format: ## Format code
 
 .PHONY: run
 run: ## Run project
-	cabal run
+	cabal exec -- ffx --hello hansy
 
 .PHONY: test
 test: ## Test code
