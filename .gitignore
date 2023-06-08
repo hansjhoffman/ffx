@@ -1,0 +1,13 @@
+# misc
+.stack-work/
+dist-newstyle/
+.nix*
+*~
+
+# editors
+.nova
+.idea
+.vscode
+
+# env
+.envrc
