@@ -2,41 +2,50 @@ module Main where
 
 import Options.Applicative
 
-data Options = Options
-  { optDeploy :: String,
-    optInit :: String
-  }
--- data Input
---   = DeployInput
---   | InitInput
+data Input
+  = DeployInput String
+  | InitInput String
 
-opts :: Parser Options
-opts =
-  Options
+deployInput :: Parser Input
+deployInput =
+  DeployInput
     <$> strOption
       ( long "deploy"
-          <> metavar "TARGET"
+          <> short 'd'
+          <> metavar "FILENAME"
           <> help "Deploy code"
       )
-    <*> strOption
+
+initInput :: Parser Input
+initInput =
+  InitInput
+    <$> strOption
       ( long "init"
+          <> short 'i'
           <> metavar "TEMPLATE"
           <> help "Codegen starter template"
       )
 
+input :: Parser Input
+input = deployInput <|> initInput
+
 main :: IO ()
-main = greet =<< execParser opts'
+main = run =<< execParser opts
   where
-    opts' =
+    opts =
       info
-        (opts <**> helper)
+        (input <**> helper)
         ( fullDesc
             <> progDesc "Print a greeting for TARGET"
             <> header "hello - a test for optparse-applicative"
         )
 
-greet :: Options -> IO ()
-greet _ = putStrLn $ "Hello!"
+run :: Input -> IO ()
+run = \case
+  DeployInput fileName -> putStrLn $ "Deploy! " ++ fileName
+  InitInput template -> putStrLn $ "Init! " ++ template
+
 -- greet (Options h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
 -- greet _ = return ()
+-- greet _ = putStrLn $ "Hello!"
 
