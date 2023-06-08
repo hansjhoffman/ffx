@@ -54,8 +54,8 @@ format: ## Format code
 
 .PHONY: run
 run: ## Run project
-	cabal exec -- arbiter-exe --verbose
+	cabal run
 
 .PHONY: test
 test: ## Test code
-	cabal test --coverage
+	cabal test
