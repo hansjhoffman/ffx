@@ -44,8 +44,3 @@ run :: Input -> IO ()
 run = \case
   DeployInput fileName -> putStrLn $ "Deploy! " ++ fileName
   InitInput template -> putStrLn $ "Init! " ++ template
-
--- greet (Options h False n) = putStrLn $ "Hello, " ++ h ++ replicate n '!'
--- greet _ = return ()
--- greet _ = putStrLn $ "Hello!"
-
