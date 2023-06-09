@@ -1,43 +1,56 @@
 module Main where
 
-import Options.Applicative
+-- import Control.Monad (join)
+import Options.Applicative ((<**>), (<|>))
+import qualified Options.Applicative as Opts
+
+-- data Options = Options
+--   { optCommand :: !Command
+--   }
+--
+-- data Command
+--   = Deploy TargetFile
+--   | Init String
+--   deriving (Eq, Show)
+--
+-- type TargetFile = String
 
 data Input
   = DeployInput String
   | InitInput String
 
-deployInput :: Parser Input
+deployInput :: Opts.Parser Input
 deployInput =
   DeployInput
-    <$> strOption
-      ( long "deploy"
-          <> short 'd'
-          <> metavar "FILENAME"
-          <> help "Deploy code"
+    <$> Opts.strOption
+      ( Opts.long "deploy"
+          <> Opts.short 'd'
+          <> Opts.metavar "FILENAME"
+          <> Opts.help "Deploy code"
       )
 
-initInput :: Parser Input
+initInput :: Opts.Parser Input
 initInput =
   InitInput
-    <$> strOption
-      ( long "init"
-          <> short 'i'
-          <> metavar "TEMPLATE"
-          <> help "Codegen starter template"
+    <$> Opts.strOption
+      ( Opts.long "init"
+          <> Opts.short 'i'
+          <> Opts.metavar "TEMPLATE"
+          <> Opts.help "Codegen starter template"
       )
 
-input :: Parser Input
+input :: Opts.Parser Input
 input = deployInput <|> initInput
 
 main :: IO ()
-main = run =<< execParser opts
+main = run =<< Opts.execParser opts
   where
     opts =
-      info
-        (input <**> helper)
-        ( fullDesc
-            <> progDesc "Print a greeting for TARGET"
-            <> header "hello - a test for optparse-applicative"
+      Opts.info
+        (input <**> Opts.helper)
+        ( Opts.fullDesc
+            <> Opts.progDesc "Print a greeting for TARGET"
+            <> Opts.header "hello - a test for optparse-applicative"
         )
 
 run :: Input -> IO ()
