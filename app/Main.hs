@@ -34,12 +34,12 @@ initCmdParser =
       )
   where
     templateReader :: Opts.ReadM Template
-    templateReader = Opts.maybeReader $ \case
-      "javascript" -> Just JavaScript
-      "typescript" -> Just TypeScript
-      "file:" -> Just (Local "asdf")
-      "remote:" -> Just (Remote "asdf")
-      _ -> Nothing
+    templateReader = Opts.eitherReader $ \case
+      "javascript" -> Right JavaScript
+      "typescript" -> Right TypeScript
+      "file:" -> Right (Local "asdf")
+      "remote:" -> Right (Remote "asdf")
+      unknown -> Left $ "Unknown template: " <> unknown
 
 publishCmdParser :: Opts.Parser Command
 publishCmdParser =
