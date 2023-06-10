@@ -9,8 +9,8 @@ import RIO.Process
 import RIO.Text qualified as T
 import Run
 import System.Environment (getEnv)
--- import System.Directory (getHomeDirectory)
--- import System.FilePath ((</>))
+-- import System.Directory (getHomeDirectory) -- https://hackage.haskell.org/package/directory-1.3.8.1/docs/System-Directory.html
+-- import System.FilePath ((</>)) -- https://hackage.haskell.org/package/filepath-1.4.100.3/docs/System-FilePath.html
 
 import Types
 
@@ -31,7 +31,7 @@ initCmdParser =
             ( Opts.listCompleter
                 [ show TypeScript,
                   show JavaScript,
-                  show (Local "file:"),
+                  show (Local "local:"),
                   show (Remote "remote:")
                 ]
             )
@@ -42,7 +42,7 @@ initCmdParser =
     templateReader = Opts.eitherReader $ \case
       "javascript" -> Right JavaScript
       "typescript" -> Right TypeScript
-      "file:" -> Right (Local "asdf")
+      "local:" -> Right (Local "asdf")
       "remote:" -> Right (Remote "asdf")
       unknown -> Left $ "Unknown template: " <> unknown
 
@@ -59,8 +59,8 @@ optionsParser :: IO (Options, ())
 optionsParser = do
   Opts.simpleOptions
     $(Opts.simpleVersion Meta.version)
-    mempty
     "Flatfile 'X' Code Generator."
+    mempty
     ( Options
         <$> Opts.switch
           ( Opts.long "debug"

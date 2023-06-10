@@ -12,8 +12,6 @@ data Command
   | Publish FilePath
   deriving (Eq, Show)
 
-type TargetFile = String
-
 data Template
   = TypeScript
   | JavaScript
