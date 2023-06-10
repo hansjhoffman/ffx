@@ -15,7 +15,7 @@ data Command
 data Template
   = TypeScript
   | JavaScript
-  | Local String
+  | Local FilePath
   | Remote String
   deriving (Eq)
 

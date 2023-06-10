@@ -65,7 +65,7 @@ optionsParser = do
         <$> Opts.switch
           ( Opts.long "debug"
               <> Opts.short 'd'
-              <> Opts.help "Output information useful for debugging"
+              <> Opts.help "Output useful information for debugging"
           )
     )
     $ do
