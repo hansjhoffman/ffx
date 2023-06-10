@@ -3,16 +3,30 @@ module Types where
 import RIO
 import RIO.Process
 
-newtype Options = Options
-  { optionsVerbose :: Bool
+data Options = Options
+  { optionsVerbose :: !Bool
+  , optionsDebug :: !Bool
   }
 
--- data Command
---   = Deploy TargetFile
---   | Init String
---   deriving (Eq, Show)
---
--- type TargetFile = String
+data Command
+  = Init Template
+  | Publish TargetFile
+  deriving (Eq, Show)
+
+type TargetFile = String
+
+data Template
+  = TypeScript
+  | JavaScript
+  | Local String
+  | Remote String
+  deriving (Eq)
+
+instance Show Template where
+  show JavaScript = "javascript"
+  show TypeScript = "typescript"
+  show (Local filePath) = filePath
+  show (Remote url) = url
 
 data App = App
   { appFlatfileSecretKey :: !Text,

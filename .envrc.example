@@ -1,1 +1,5 @@
 use nix
+
+export FLATFILE_SECRET_KEY=asdf
+export FFX_PACKAGE_MANAGER=yarn
+
