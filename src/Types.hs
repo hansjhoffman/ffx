@@ -9,7 +9,7 @@ data Options = Options
 
 data Command
   = Init Template
-  | Publish TargetFile
+  | Publish FilePath
   deriving (Eq, Show)
 
 type TargetFile = String

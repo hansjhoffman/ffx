@@ -22,12 +22,19 @@ runCmd = \case
 initCmdParser :: Opts.Parser Command
 initCmdParser =
   Init
-    <$> Opts.argument
+    <$> Opts.option
       templateReader
-      ( Opts.metavar "TEMPLATE"
+      ( Opts.long "template"
+          <> Opts.metavar "TEMPLATE"
           <> Opts.value TypeScript
           <> Opts.completer
-            (Opts.listCompleter [show TypeScript, show JavaScript])
+            ( Opts.listCompleter
+                [ show TypeScript,
+                  show JavaScript,
+                  show (Local "file:"),
+                  show (Remote "remote:")
+                ]
+            )
           <> Opts.help "Project template (javascript, typescript, file:, remote:)"
       )
   where
