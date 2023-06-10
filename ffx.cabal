@@ -63,6 +63,7 @@ common warnings
 common extensions
     default-extensions:
         LambdaCase
+        OverloadedStrings
 
 library
     -- Import common warning flags.
@@ -71,7 +72,9 @@ library
         extensions
 
     -- Modules exported by the library.
-    exposed-modules:  MyLib
+    exposed-modules:
+        Run,
+        Types
 
     -- Modules included in this library but not exported.
     -- other-modules:
@@ -82,6 +85,7 @@ library
     -- Other library packages from which modules are imported.
     build-depends:
         base ^>=4.16.0.0,
+        optparse-simple ^>=0.1.1.4,
         rio ^>=0.1.22.0
 
     -- Directories containing source files.
@@ -100,7 +104,8 @@ executable ffx
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules:
+        Paths_ffx
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
@@ -111,7 +116,8 @@ executable ffx
     -- Other library packages from which modules are imported.
     build-depends:
         base ^>=4.16.0.0,
-        optparse-applicative ^>=0.18.1.0,
+        optparse-simple ^>=0.1.1.4,
+        rio ^>=0.1.22.0,
         ffx
 
     -- Directories containing source files.

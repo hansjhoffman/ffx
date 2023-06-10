@@ -1,59 +1,45 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Main where
 
--- import Control.Monad (join)
-import Options.Applicative ((<**>), (<|>))
-import qualified Options.Applicative as Opts
+import qualified Options.Applicative.Simple as Opts
+import qualified Paths_ffx
+import RIO
+import RIO.Process
+import Run
+import qualified RIO.Text as T
+import System.Environment (getEnv)
 
--- data Options = Options
---   { optCommand :: !Command
---   }
---
--- data Command
---   = Deploy TargetFile
---   | Init String
---   deriving (Eq, Show)
---
--- type TargetFile = String
+import Types
 
-data Input
-  = DeployInput String
-  | InitInput String
-
-deployInput :: Opts.Parser Input
-deployInput =
-  DeployInput
-    <$> Opts.strOption
-      ( Opts.long "deploy"
-          <> Opts.short 'd'
-          <> Opts.metavar "FILENAME"
-          <> Opts.help "Deploy code"
-      )
-
-initInput :: Opts.Parser Input
-initInput =
-  InitInput
-    <$> Opts.strOption
-      ( Opts.long "init"
-          <> Opts.short 'i'
-          <> Opts.metavar "TEMPLATE"
-          <> Opts.help "Codegen starter template"
-      )
-
-input :: Opts.Parser Input
-input = deployInput <|> initInput
+optionsParser :: IO (Options, ())
+optionsParser = do
+  Opts.simpleOptions
+    $(Opts.simpleVersion Paths_ffx.version)
+    "Header for command line arguments"
+    "Flatfile 'X' Code Generator."
+    ( Options
+        <$> Opts.switch
+          ( Opts.short 'v'
+              <> Opts.long "verbose"
+              <> Opts.help "Verbose output?"
+          )
+    )
+    Opts.empty
 
 main :: IO ()
-main = run =<< Opts.execParser opts
-  where
-    opts =
-      Opts.info
-        (input <**> Opts.helper)
-        ( Opts.fullDesc
-            <> Opts.progDesc "Print a greeting for TARGET"
-            <> Opts.header "hello - a test for optparse-applicative"
-        )
+main = do
+  (options, ()) <- optionsParser
+  logOpts <- logOptionsHandle stderr $ optionsVerbose options
+  processCtx <- mkDefaultProcessContext
+  flatfileSecretKey <- getEnv "FLATFILE_SECRET_KEY"
+  withLogFunc logOpts $ \logFn ->
+    let app =
+          App
+            { appFlatfileSecretKey = T.pack flatfileSecretKey,
+              appLogFn = logFn,
+              appOptions = options,
+              appProcessContext = processCtx
+            }
+     in runRIO app run
 
-run :: Input -> IO ()
-run = \case
-  DeployInput fileName -> putStrLn $ "Deploy! " ++ fileName
-  InitInput template -> putStrLn $ "Init! " ++ template
