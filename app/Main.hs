@@ -9,15 +9,8 @@ import RIO.Process
 import RIO.Text qualified as T
 import Run
 import System.Environment (getEnv)
--- import System.Directory (getHomeDirectory) -- https://hackage.haskell.org/package/directory-1.3.8.1/docs/System-Directory.html
--- import System.FilePath ((</>)) -- https://hackage.haskell.org/package/filepath-1.4.100.3/docs/System-FilePath.html
 
 import Types
-
-runCmd :: Command -> ()
-runCmd = \case
-  (Init _) -> ()
-  (Publish _) -> ()
 
 initCmdParser :: Opts.Parser Command
 initCmdParser =
@@ -65,19 +58,19 @@ optionsParser = do
         <$> Opts.switch
           ( Opts.long "debug"
               <> Opts.short 'd'
-              <> Opts.help "Output useful information for debugging"
+              <> Opts.help "Output information useful for debugging"
           )
     )
     $ do
       Opts.addCommand
         "init"
         "Initialize a Flatfile 'X' configuration project"
-        runCmd
+        (pure ())
         initCmdParser
       Opts.addCommand
         "publish"
         "Publish your configuration to Flatfile"
-        runCmd
+        (pure ())
         publishCmdParser
 
 main :: IO ()
