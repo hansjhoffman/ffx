@@ -2,14 +2,13 @@
 
 module Main where
 
-import qualified Options.Applicative.Simple as Opts
-import qualified Paths_ffx as Meta
+import Options.Applicative.Simple qualified as Opts
+import Paths_ffx qualified as Meta
 import RIO
 import RIO.Process
+import RIO.Text qualified as T
 import Run
-import qualified RIO.Text as T
 import System.Environment (getEnv)
-
 -- import System.Directory (getHomeDirectory)
 -- import System.FilePath ((</>))
 
@@ -30,7 +29,6 @@ initCmdParser =
           <> Opts.completer
             (Opts.listCompleter [show TypeScript, show JavaScript])
           <> Opts.help "Project template (javascript, typescript, file:, remote:)"
-
       )
   where
     templateReader :: Opts.ReadM Template
@@ -58,31 +56,27 @@ optionsParser = do
     "Flatfile 'X' Code Generator."
     ( Options
         <$> Opts.switch
-          ( Opts.short 'v'
-              <> Opts.long "verbose"
-              <> Opts.help "Verbose output?"
-          )
-        <*> Opts.switch
           ( Opts.long "debug"
-              <> Opts.help "Debug?"
+              <> Opts.short 'd'
+              <> Opts.help "Output information useful for debugging"
           )
     )
     $ do
       Opts.addCommand
         "init"
-        "Initialize a Flatfile 'X' configuration project."
+        "Initialize a Flatfile 'X' configuration project"
         runCmd
         initCmdParser
       Opts.addCommand
         "publish"
-        "Publish your configuration to Flatfile."
+        "Publish your configuration to Flatfile"
         runCmd
         publishCmdParser
 
 main :: IO ()
 main = do
   (options, ()) <- optionsParser
-  logOpts <- logOptionsHandle stderr $ optionsVerbose options
+  logOpts <- logOptionsHandle stderr $ optionsDebug options
   processCtx <- mkDefaultProcessContext
   flatfileSecretKey <- getEnv "FLATFILE_SECRET_KEY"
   withLogFunc logOpts $ \logFn ->
@@ -94,4 +88,3 @@ main = do
               appProcessContext = processCtx
             }
      in runRIO app run
-

@@ -4,8 +4,7 @@ import RIO
 import RIO.Process
 
 data Options = Options
-  { optionsVerbose :: !Bool
-  , optionsDebug :: !Bool
+  { optionsDebug :: !Bool
   }
 
 data Command

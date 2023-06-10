@@ -37,10 +37,6 @@ targets:
 build: ## Make a production build
 	cabal build
 
-.PHONY: build-watch
-build-watch: ## Watch files for changes and re-build
-	cabal build --file-watch
-
 .PHONY: clean
 clean: ## Remove artificats
 	cabal clean
@@ -50,7 +46,7 @@ clean: ## Remove artificats
 
 .PHONY: format
 format: ## Format code
-	brittany --write-mode=inplace app/**/*.hs src/**/*.hs test/**/*.hs
+	ormolu --mode inplace `git ls-files '*.hs'`
 
 .PHONY: run
 run: ## Run project
