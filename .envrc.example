@@ -1,5 +1,6 @@
 use nix
 
-export FLATFILE_SECRET_KEY=asdf
-export FFX_PACKAGE_MANAGER=yarn
+export FFX_SECRET_KEY=chage_me
+export FFX_ENV_ID=change_me
+export FFX_PKG_MANAGER=yarn
 

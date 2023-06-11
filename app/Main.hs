@@ -1,90 +1,102 @@
 {-# LANGUAGE TemplateHaskell #-}
 
-module Main where
+module Main (main) where
 
-import Options.Applicative.Simple qualified as Opts
+import Data.Version qualified as V
+import Options.Applicative qualified as Opts
 import Paths_ffx qualified as Meta
 import RIO
 import RIO.Process
 import RIO.Text qualified as T
 import Run
 import System.Environment (getEnv)
-
 import Types
 
-initCmdParser :: Opts.Parser Command
-initCmdParser =
-  Init
-    <$> Opts.option
-      templateReader
-      ( Opts.long "template"
-          <> Opts.metavar "TEMPLATE"
-          <> Opts.value TypeScript
-          <> Opts.completer
-            ( Opts.listCompleter
-                [ show TypeScript,
-                  show JavaScript,
-                  show (Local "local:"),
-                  show (Remote "remote:")
-                ]
-            )
-          <> Opts.help "Project template (javascript, typescript, file:, remote:)"
-      )
+initCmd :: Opts.Mod Opts.CommandFields Command
+initCmd =
+  Opts.command
+    "init"
+    ( Opts.info parser $
+        Opts.progDesc "Initialize a Flatfile 'X' configuration project"
+    )
   where
+    parser =
+      Init
+        <$> Opts.option
+          templateReader
+          ( Opts.long "template"
+              <> Opts.metavar "TEMPLATE"
+              <> Opts.value TypeScript
+              <> Opts.showDefault
+              <> Opts.help "Project template. Either 'javascript', 'typescript', 'file:', 'remote:')"
+          )
     templateReader :: Opts.ReadM Template
     templateReader = Opts.eitherReader $ \case
       "javascript" -> Right JavaScript
       "typescript" -> Right TypeScript
       "local:" -> Right (Local "asdf")
       "remote:" -> Right (Remote "asdf")
-      unknown -> Left $ "Unknown template: " <> unknown
+      bad -> Left $ "Unknown template: " <> bad
 
-publishCmdParser :: Opts.Parser Command
-publishCmdParser =
-  Publish
-    <$> Opts.strOption
-      ( Opts.long "file"
-          <> Opts.metavar "FILEPATH"
-          <> Opts.help "Path to CJS file."
-      )
-
-optionsParser :: IO (Options, ())
-optionsParser = do
-  Opts.simpleOptions
-    $(Opts.simpleVersion Meta.version)
-    "Flatfile 'X' Code Generator."
-    mempty
-    ( Options
-        <$> Opts.switch
-          ( Opts.long "debug"
-              <> Opts.short 'd'
-              <> Opts.help "Output information useful for debugging"
-          )
+publishCmd :: Opts.Mod Opts.CommandFields Command
+publishCmd =
+  Opts.command
+    "publish"
+    ( Opts.info parser $
+        Opts.progDesc "Publish your configuration to Flatfile"
     )
-    $ do
-      Opts.addCommand
-        "init"
-        "Initialize a Flatfile 'X' configuration project"
-        (pure ())
-        initCmdParser
-      Opts.addCommand
-        "publish"
-        "Publish your configuration to Flatfile"
-        (pure ())
-        publishCmdParser
+  where
+    parser =
+      Publish
+        <$> Opts.strOption
+          ( Opts.long "file"
+              <> Opts.metavar "FILEPATH"
+              <> Opts.help "Path to CJS file."
+          )
+
+programOptions :: Opts.Parser AppOptions
+programOptions =
+  AppOptions
+    <$> Opts.switch
+      ( Opts.long "debug"
+          <> Opts.short 'd'
+          <> Opts.help "Output information useful for debugging"
+      )
+    <*> Opts.subparser (initCmd <> publishCmd)
+
+versionOption :: Opts.Parser (a -> a)
+versionOption =
+  Opts.infoOption
+    (prettyVersion Meta.version)
+    (Opts.long "version" <> Opts.help "Show version")
+  where
+    prettyVersion :: V.Version -> [Char]
+    prettyVersion = (++) "ffx v" . V.showVersion
+
+optsParser :: Opts.ParserInfo AppOptions
+optsParser =
+  Opts.info
+    (Opts.helper <*> versionOption <*> programOptions)
+    ( Opts.fullDesc
+        <> Opts.header "Flatfile 'X' CLI"
+        <> Opts.progDesc "Create a starter project and publish your code."
+        <> Opts.footer "For more information on ffx, please visit https://foobar.com"
+    )
 
 main :: IO ()
 main = do
-  (options, ()) <- optionsParser
-  logOpts <- logOptionsHandle stderr $ optionsDebug options
+  opts <- Opts.customExecParser (Opts.prefs Opts.showHelpOnEmpty) optsParser
+  logOpts <- logOptionsHandle stderr $ aoDebug opts
   processCtx <- mkDefaultProcessContext
-  flatfileSecretKey <- getEnv "FLATFILE_SECRET_KEY"
+  flatfileEnvId <- getEnv "FFX_ENV_ID"
+  flatfileSecretKey <- getEnv "FFX_SECRET_KEY"
   withLogFunc logOpts $ \logFn ->
     let app =
           App
-            { appFlatfileSecretKey = T.pack flatfileSecretKey,
+            { appFlatfileEnvId = T.pack flatfileEnvId,
+              appFlatfileSecretKey = T.pack flatfileSecretKey,
               appLogFn = logFn,
-              appOptions = options,
+              appOptions = opts,
               appProcessContext = processCtx
             }
      in runRIO app run

@@ -1,7 +1,4 @@
-module Run
-  ( run,
-  )
-where
+module Run (run) where
 
 import RIO
 import Types
@@ -11,5 +8,7 @@ import Types
 
 run :: RIO App ()
 run = do
+  env <- ask
+  logInfo $ displayShow (view optsL env)
   logDebug "Done!"
   logInfo "Done!!"
