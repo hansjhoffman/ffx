@@ -2,7 +2,7 @@ let
   sources = import ./nix/sources.nix { };
   pkgs = import sources.nixpkgs { };
 
-  haskellDeps = ps: with ps; [ base hspec rio ];
+  haskellDeps = ps: with ps; [ base aeson hspec http-conduit http-types rio ];
 
   ghc = pkgs.haskell.compiler.ghc961 haskellDeps;
 
@@ -11,6 +11,7 @@ let
     pkgs.gcc
     pkgs.ghc
     pkgs.ghcid
+    pkgs.haskell-language-server
     pkgs.llvm
     pkgs.nixfmt
     pkgs.ormolu

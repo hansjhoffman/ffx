@@ -1,6 +1,6 @@
 module Run (run) where
 
-import Api.Environment qualified as Api.Environment
+import Api.Environment qualified
 import RIO
 import Types
 
@@ -21,6 +21,6 @@ publish targetFile = do
 run :: RIO App ()
 run = do
   env <- ask
-  case (aoCommand $ view optsL env) of
+  case aoCommand $ view optsL env of
     Init template -> init template
     Publish targetFile -> publish targetFile

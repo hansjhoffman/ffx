@@ -16,7 +16,7 @@ newtype AccountId = AccountId
   deriving (Eq)
 
 instance Show AccountId where
-  show (AccountId accountId) = "AccountId \"" <> (T.unpack accountId) <> "\""
+  show (AccountId accountId) = "AccountId \"" <> T.unpack accountId <> "\""
 
 instance FromJSON AccountId where
   parseJSON = JSON.withText "AccountId" (return . AccountId)
@@ -27,7 +27,7 @@ newtype AgentId = AgentId
   deriving (Eq)
 
 instance Show AgentId where
-  show (AgentId agentId) = "AgentId \"" <> (T.unpack agentId) <> "\""
+  show (AgentId agentId) = "AgentId \"" <> T.unpack agentId <> "\""
 
 instance FromJSON AgentId where
   parseJSON = JSON.withText "AgentId" (return . AgentId)
@@ -38,7 +38,7 @@ newtype EnvironmentId = EnvironmentId
   deriving (Eq)
 
 instance Show EnvironmentId where
-  show (EnvironmentId envId) = "EnvironmentId \"" <> (T.unpack envId) <> "\""
+  show (EnvironmentId envId) = "EnvironmentId \"" <> T.unpack envId <> "\""
 
 instance FromJSON EnvironmentId where
   parseJSON = JSON.withText "EnvironmentId" (return . EnvironmentId)
