@@ -64,4 +64,5 @@ get :: EnvironmentId -> RIO App (Either JSONException Environment)
 get envId = do
   env <- ask
   response <- HTTP.httpJSONEither $ buildRequest env envId
+  logDebug $ displayShow response
   return $ HTTP.getResponseBody response
