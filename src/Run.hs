@@ -17,11 +17,13 @@ publish :: FilePath -> RIO App ()
 publish targetFile = do
   env <- ask
   logInfo $ "publish " <> displayShow targetFile
-  res <- Api.Environment.get (view flatfileEnvIdL env)
-  logInfo $ displayShow res
+
   sourceCode <- liftIO $ readFile targetFile
-  agent <- Api.Agent.create $ T.pack sourceCode
-  logInfo $ displayShow agent
+
+  Api.Environment.get (view flatfileEnvIdL env)
+    >> Api.Agent.create (T.pack sourceCode)
+    >>= logDebug . displayShow
+
   logInfo "Done!! 🎉"
 
 run :: RIO App ()
