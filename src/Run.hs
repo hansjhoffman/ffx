@@ -1,5 +1,6 @@
 module Run (run) where
 
+import Api.Environment qualified as Api.Environment
 import RIO
 import Types
 
@@ -10,5 +11,6 @@ run :: RIO App ()
 run = do
   env <- ask
   logInfo $ displayShow (view optsL env)
-  logDebug "Done!"
+  res <- Api.Environment.get (view flatfileEnvIdL env)
+  logInfo $ displayShow res
   logInfo "Done!!"

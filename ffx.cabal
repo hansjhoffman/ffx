@@ -114,7 +114,8 @@ library
         Api.Id
 
     -- Modules included in this library but not exported.
-    -- other-modules:
+    other-modules:
+        Paths_ffx
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

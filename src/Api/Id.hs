@@ -8,11 +8,15 @@ where
 import Data.Aeson (FromJSON (..))
 import Data.Aeson qualified as JSON
 import RIO
+import RIO.Text qualified as T
 
 newtype AccountId = AccountId
   { unAccountId :: Text
   }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show AccountId where
+  show (AccountId accountId) = "AccountId \"" <> (T.unpack accountId) <> "\""
 
 instance FromJSON AccountId where
   parseJSON = JSON.withText "AccountId" (return . AccountId)
@@ -20,7 +24,10 @@ instance FromJSON AccountId where
 newtype AgentId = AgentId
   { unAgentId :: Text
   }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show AgentId where
+  show (AgentId agentId) = "AgentId \"" <> (T.unpack agentId) <> "\""
 
 instance FromJSON AgentId where
   parseJSON = JSON.withText "AgentId" (return . AgentId)
@@ -28,7 +35,10 @@ instance FromJSON AgentId where
 newtype EnvironmentId = EnvironmentId
   { unEnvironmentId :: Text
   }
-  deriving (Eq, Show)
+  deriving (Eq)
+
+instance Show EnvironmentId where
+  show (EnvironmentId envId) = "EnvironmentId \"" <> (T.unpack envId) <> "\""
 
 instance FromJSON EnvironmentId where
   parseJSON = JSON.withText "EnvironmentId" (return . EnvironmentId)

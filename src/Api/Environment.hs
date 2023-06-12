@@ -8,12 +8,14 @@ import Api.Id (AccountId, EnvironmentId)
 import Api.Id qualified as Id
 import Data.Aeson (FromJSON (..), (.:), (.:?))
 import Data.Aeson qualified as JSON
+import Data.Version qualified as V
 import Network.HTTP.Simple
   ( JSONException,
     Request,
   )
 import Network.HTTP.Simple qualified as HTTP
 import Network.HTTP.Types.Header as Header
+import Paths_ffx qualified as Meta
 import RIO
 import RIO.Text qualified as T
 import Types
@@ -28,7 +30,8 @@ data Environment = Environment
   deriving (Eq, Show)
 
 instance FromJSON Environment where
-  parseJSON = JSON.withObject "Environment" $ \obj ->
+  parseJSON = JSON.withObject "Environment" $ \o -> do
+    obj <- o .: "data"
     Environment
       <$> (obj .: "id")
       <*> (obj .:? "accountId")
@@ -38,24 +41,21 @@ instance FromJSON Environment where
 
 buildRequest :: App -> EnvironmentId -> Request
 buildRequest env envId =
-  HTTP.setRequestHost host
-    $ HTTP.setRequestPort 443
-    $ HTTP.setRequestSecure True
-    $ HTTP.setRequestPath path
-    $ HTTP.setRequestHeaders
-      [ (Header.hAuthorization, T.encodeUtf8 $ "Bearer :" <> flatfileSecretKey),
-        (Header.hUserAgent, T.encodeUtf8 "ffx") -- would be nice to include version
-      ]
-    $ HTTP.setRequestQueryString
-      [ ("environmentId", Just . T.encodeUtf8 $ tshow $ Id.unEnvironmentId envId)
-      ]
-      HTTP.defaultRequest
+  HTTP.setRequestHost host $
+    HTTP.setRequestPort 443 $
+      HTTP.setRequestSecure True $
+        HTTP.setRequestPath path $
+          HTTP.setRequestHeaders
+            [ (Header.hAuthorization, T.encodeUtf8 $ "Bearer " <> flatfileSecretKey),
+              (Header.hUserAgent, T.encodeUtf8 $ T.pack $ "ffx v" <> V.showVersion Meta.version)
+            ]
+            HTTP.defaultRequest
   where
     host :: ByteString
     host = "platform.flatfile.com"
 
     path :: ByteString
-    path = "v1/environments"
+    path = T.encodeUtf8 $ "api/v1/environments/" <> Id.unEnvironmentId envId
 
     flatfileSecretKey :: Text
     flatfileSecretKey = view flatfileSecretKeyL env

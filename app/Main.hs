@@ -2,6 +2,7 @@
 
 module Main (main) where
 
+import Api.Id (EnvironmentId (..))
 import Data.Version qualified as V
 import Options.Applicative qualified as Opts
 import Paths_ffx qualified as Meta
@@ -93,7 +94,7 @@ main = do
   withLogFunc logOpts $ \logFn ->
     let app =
           App
-            { appFlatfileEnvId = T.pack flatfileEnvId,
+            { appFlatfileEnvId = EnvironmentId $ T.pack flatfileEnvId,
               appFlatfileSecretKey = T.pack flatfileSecretKey,
               appLogFn = logFn,
               appOptions = opts,

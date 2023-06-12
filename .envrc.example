@@ -1,6 +1,6 @@
 use nix
 
-export FFX_SECRET_KEY=chage_me
+export FFX_SECRET_KEY=change_me
 export FFX_ENV_ID=change_me
 export FFX_PKG_MANAGER=yarn
 

@@ -1,5 +1,6 @@
 module Types where
 
+import Api.Id (EnvironmentId)
 import RIO
 import RIO.Process
 
@@ -28,7 +29,7 @@ instance Show Template where
   show (Remote url) = url
 
 data App = App
-  { appFlatfileEnvId :: !Text,
+  { appFlatfileEnvId :: !EnvironmentId,
     appFlatfileSecretKey :: !Text,
     appLogFn :: !LogFunc,
     appOptions :: !AppOptions,
@@ -36,7 +37,7 @@ data App = App
   }
 
 class HasFlatfileEnvId env where
-  flatfileEnvIdL :: Lens' env Text
+  flatfileEnvIdL :: Lens' env EnvironmentId
 
 instance HasFlatfileEnvId App where
   flatfileEnvIdL = lens appFlatfileEnvId (\x y -> x {appFlatfileEnvId = y})
