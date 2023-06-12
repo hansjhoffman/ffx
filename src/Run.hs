@@ -13,4 +13,4 @@ run = do
   logInfo $ displayShow (view optsL env)
   res <- Api.Environment.get (view flatfileEnvIdL env)
   logInfo $ displayShow res
-  logInfo "Done!!"
+  logInfo "Done!! 🎉"
