@@ -1,5 +1,6 @@
 module Run (run) where
 
+import Api.Agent qualified
 import Api.Environment qualified
 import RIO
 import Types
@@ -16,6 +17,8 @@ publish targetFile = do
   logInfo $ "publish " <> displayShow targetFile
   res <- Api.Environment.get (view flatfileEnvIdL env)
   logInfo $ displayShow res
+  agent <- Api.Agent.create "module.exports = { routeEvent: async (...args) => { console.log(args) } }"
+  logInfo $ displayShow agent
   logInfo "Done!! 🎉"
 
 run :: RIO App ()
