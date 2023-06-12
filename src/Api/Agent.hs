@@ -201,9 +201,9 @@ buildRequest env sourceCode =
       jsonBody :: JSON.Value
       jsonBody =
         JSON.object
-          [ "topics" .= (["record:created"] :: [String]),
+          [ "topics" .= [RecordCreated],
             "compiler" .= ("js" :: String),
-            "source" .= T.unpack sourceCode
+            "source" .= sourceCode
           ]
    in HTTP.setRequestHost host
         $ HTTP.setRequestMethod "POST"
