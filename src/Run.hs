@@ -11,12 +11,16 @@ import Prelude (readFile)
 -- import System.FilePath ((</>)) -- https://hackage.haskell.org/package/filepath-1.4.100.3/docs/System-FilePath.html
 
 init :: Template -> RIO App ()
-init = logInfo . (<>) "init " . displayShow
+init = \case
+  JavaScript -> logInfo "JavaScript"
+  Local _ -> logInfo "local"
+  Remote _ -> logInfo "remote"
+  TypeScript -> logInfo "TypeScript"
 
 publish :: FilePath -> RIO App ()
 publish targetFile = do
   env <- ask
-  logInfo $ "publish " <> displayShow targetFile
+  logDebug $ "publish " <> displayShow targetFile
 
   sourceCode <- liftIO $ readFile targetFile
 

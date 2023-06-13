@@ -16,17 +16,17 @@ data Command
   deriving (Eq, Show)
 
 data Template
-  = TypeScript
-  | JavaScript
+  = JavaScript
   | Local FilePath
   | Remote String
+  | TypeScript
   deriving (Eq)
 
 instance Show Template where
   show JavaScript = "JavaScript"
-  show TypeScript = "TypeScript"
   show (Local filePath) = filePath
   show (Remote url) = url
+  show TypeScript = "TypeScript"
 
 data App = App
   { appFlatfileEnvId :: !EnvironmentId,
