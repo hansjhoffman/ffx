@@ -32,9 +32,11 @@ publish targetFile = do
 
   Api.Environment.get (view flatfileEnvIdL env)
     >> Api.Agent.create (T.pack sourceCode)
-    >>= logDebug . displayShow
-
-  logInfo "Done!! 🎉"
+    >>= \case
+      Left _ -> logError "❌ Uh oh! Failed to create an Agent."
+      Right agent -> do
+        logInfo $ "Created Agent: " <> displayShow (Api.Agent.agentId agent)
+        logInfo "Done!! 🎉"
 
 run :: RIO App ()
 run = do

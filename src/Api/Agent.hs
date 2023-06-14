@@ -1,5 +1,5 @@
 module Api.Agent
-  ( Agent,
+  ( Agent (..),
     create,
   )
 where
