@@ -24,10 +24,10 @@ initCmd =
         <$> Opts.option
           templateReader
           ( Opts.long "template"
-              <> Opts.metavar "TEMPLATE"
+              <> Opts.metavar "<TEMPLATE>"
               <> Opts.value TypeScript
               <> Opts.showDefault
-              <> Opts.help "Project template. Either 'javascript', 'typescript', 'file:', 'remote:')"
+              <> Opts.help "Project template. Either 'javascript', 'typescript', 'local:', 'remote:')"
           )
     templateReader :: Opts.ReadM Template
     templateReader = Opts.eitherReader $ \case
@@ -49,7 +49,7 @@ publishCmd =
       Publish
         <$> Opts.strOption
           ( Opts.long "file"
-              <> Opts.metavar "FILEPATH"
+              <> Opts.metavar "<FILE_PATH>"
               <> Opts.help "Path to CJS file."
           )
 

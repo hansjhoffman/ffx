@@ -4,17 +4,23 @@ import Api.Agent qualified
 import Api.Environment qualified
 import RIO
 import RIO.Text qualified as T
+import System.Directory qualified as Dir
 import Types
 import Prelude (readFile)
 
--- import System.Directory (getHomeDirectory) -- https://hackage.haskell.org/package/directory-1.3.8.1/docs/System-Directory.html
 -- import System.FilePath ((</>)) -- https://hackage.haskell.org/package/filepath-1.4.100.3/docs/System-FilePath.html
 
 init :: Template -> RIO App ()
 init = \case
   JavaScript -> logInfo "JavaScript"
-  Local _ -> logInfo "local"
-  Remote _ -> logInfo "remote"
+  Local dir -> do
+    isValidPath <- liftIO $ Dir.doesPathExist dir
+    if isValidPath
+      then logInfo "cool cool"
+      else logInfo "yo! where you at?"
+  Remote _ -> do
+    tmpDir <- liftIO Dir.getTemporaryDirectory
+    logInfo $ displayShow tmpDir
   TypeScript -> logInfo "TypeScript"
 
 publish :: FilePath -> RIO App ()
