@@ -13,7 +13,8 @@ import Data.Aeson
     (.:?),
     (.=),
   )
-import Data.Aeson qualified as JSON
+import Data.Aeson qualified as J
+import Data.Aeson.Encoding qualified as JE
 import Data.Version qualified as V
 import Network.HTTP.Simple
   ( JSONException,
@@ -35,7 +36,7 @@ data Agent = Agent
   deriving (Eq, Show)
 
 instance FromJSON Agent where
-  parseJSON = JSON.withObject "Agent" $ \o -> do
+  parseJSON = J.withObject "Agent" $ \o -> do
     obj <- o .: "data"
     Agent
       <$> (obj .: "id")
@@ -76,7 +77,7 @@ data EventTopic
   | WorkbookCreated
   | WorkbookDeleted
   | WorkbookUpdated
-  deriving (Eq)
+  deriving (Eq, Generic)
 
 instance Show EventTopic where
   show AgentCreated = "agent:created"
@@ -113,7 +114,7 @@ instance Show EventTopic where
   show WorkbookUpdated = "workbook:updated"
 
 instance FromJSON EventTopic where
-  parseJSON = JSON.withText "EventTopic" $ \case
+  parseJSON = J.withText "EventTopic" $ \case
     "agent:created" -> pure AgentCreated
     "agent:deleted" -> pure AgentDeleted
     "agent:updated" -> pure AgentUpdated
@@ -149,7 +150,6 @@ instance FromJSON EventTopic where
     _ -> fail "Unknown event topic"
 
 instance ToJSON EventTopic where
-  -- toEncoding = \case
   toJSON = \case
     AgentCreated -> "agent:created"
     AgentDeleted -> "agent:deleted"
@@ -184,6 +184,41 @@ instance ToJSON EventTopic where
     WorkbookDeleted -> "workbook:deleted"
     WorkbookUpdated -> "workbook:updated"
 
+  toEncoding =
+    JE.text . \case
+      AgentCreated -> "agent:created"
+      AgentDeleted -> "agent:deleted"
+      AgentUpdated -> "agent:updated"
+      CommitCreated -> "commit:created"
+      CommitUpdated -> "commit:updated"
+      DocumentCreated -> "document:created"
+      DocumentDeleted -> "document:deleted"
+      DocumentUpdated -> "document:updated"
+      FileCreated -> "file:created"
+      FileDeleted -> "file:deleted"
+      FileUpdated -> "file:updated"
+      JobAcknowledged -> "job:outcome-acknowledged"
+      JobCompleted -> "job:completed"
+      JobCreated -> "job:created"
+      JobDeleted -> "job:deleted"
+      JobFailed -> "job:failed"
+      JobReady -> "job:ready"
+      JobScheduled -> "job:scheduled"
+      JobUpdated -> "job:updated"
+      LayerCreated -> "layer:created"
+      RecordCreated -> "record:created"
+      RecordDeleted -> "record:deleted"
+      RecordUpdated -> "record:updated"
+      SheetCreated -> "sheet:created"
+      SheetDeleted -> "sheet:deleted"
+      SheetUpdated -> "sheet:updated"
+      SpaceCreated -> "space:created"
+      SpaceDeleted -> "space:deleted"
+      SpaceUpdated -> "space:updated"
+      WorkbookCreated -> "workbook:created"
+      WorkbookDeleted -> "workbook:deleted"
+      WorkbookUpdated -> "workbook:updated"
+
 buildRequest :: App -> Text -> Request
 buildRequest env sourceCode =
   let host :: ByteString
@@ -198,9 +233,9 @@ buildRequest env sourceCode =
       envId :: ByteString
       envId = T.encodeUtf8 $ Id.unEnvironmentId (view flatfileEnvIdL env)
 
-      jsonBody :: JSON.Value
+      jsonBody :: J.Value
       jsonBody =
-        JSON.object
+        J.object
           [ "topics" .= [RecordCreated],
             "compiler" .= ("js" :: String),
             "source" .= sourceCode

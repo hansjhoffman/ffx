@@ -6,7 +6,7 @@ module Api.Id
 where
 
 import Data.Aeson (FromJSON (..))
-import Data.Aeson qualified as JSON
+import Data.Aeson qualified as J
 import RIO
 import RIO.Text qualified as T
 
@@ -19,7 +19,7 @@ instance Show AccountId where
   show (AccountId accountId) = "AccountId \"" <> T.unpack accountId <> "\""
 
 instance FromJSON AccountId where
-  parseJSON = JSON.withText "AccountId" (return . AccountId)
+  parseJSON = J.withText "AccountId" (return . AccountId)
 
 newtype AgentId = AgentId
   { unAgentId :: Text
@@ -30,7 +30,7 @@ instance Show AgentId where
   show (AgentId agentId) = "AgentId \"" <> T.unpack agentId <> "\""
 
 instance FromJSON AgentId where
-  parseJSON = JSON.withText "AgentId" (return . AgentId)
+  parseJSON = J.withText "AgentId" (return . AgentId)
 
 newtype EnvironmentId = EnvironmentId
   { unEnvironmentId :: Text
@@ -41,4 +41,4 @@ instance Show EnvironmentId where
   show (EnvironmentId envId) = "EnvironmentId \"" <> T.unpack envId <> "\""
 
 instance FromJSON EnvironmentId where
-  parseJSON = JSON.withText "EnvironmentId" (return . EnvironmentId)
+  parseJSON = J.withText "EnvironmentId" (return . EnvironmentId)

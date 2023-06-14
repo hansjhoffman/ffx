@@ -7,7 +7,7 @@ where
 import Api.Id (AccountId, EnvironmentId)
 import Api.Id qualified as Id
 import Data.Aeson (FromJSON (..), (.:), (.:?))
-import Data.Aeson qualified as JSON
+import Data.Aeson qualified as J
 import Data.Version qualified as V
 import Network.HTTP.Simple
   ( JSONException,
@@ -30,7 +30,7 @@ data Environment = Environment
   deriving (Eq, Show)
 
 instance FromJSON Environment where
-  parseJSON = JSON.withObject "Environment" $ \o -> do
+  parseJSON = J.withObject "Environment" $ \o -> do
     obj <- o .: "data"
     Environment
       <$> (obj .: "id")
