@@ -47,7 +47,7 @@ buildRequest env envId =
         HTTP.setRequestPath path $
           HTTP.setRequestHeaders
             [ (Header.hAuthorization, T.encodeUtf8 $ "Bearer " <> flatfileSecretKey),
-              (Header.hUserAgent, T.encodeUtf8 $ T.pack $ "ffx v" <> V.showVersion Meta.version)
+              (Header.hUserAgent, T.encodeUtf8 $ view nameL env <> " v" <> T.pack (V.showVersion Meta.version))
             ]
             HTTP.defaultRequest
   where

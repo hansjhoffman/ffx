@@ -32,6 +32,7 @@ data App = App
   { appFlatfileEnvId :: !EnvironmentId,
     appFlatfileSecretKey :: !Text,
     appLogFn :: !LogFunc,
+    appName :: !Text,
     appOptions :: !AppOptions,
     appProcessContext :: !ProcessContext
   }
@@ -47,6 +48,12 @@ class HasFlatfileSecretKey env where
 
 instance HasFlatfileSecretKey App where
   flatfileSecretKeyL = lens appFlatfileSecretKey (\x y -> x {appFlatfileSecretKey = y})
+
+class HasName env where
+  nameL :: Lens' env Text
+
+instance HasName App where
+  nameL = lens appName (\x y -> x {appName = y})
 
 class HasAppOptions env where
   optsL :: Lens' env AppOptions

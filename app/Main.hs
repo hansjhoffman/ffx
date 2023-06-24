@@ -85,6 +85,7 @@ main = do
             { appFlatfileEnvId = EnvironmentId $ T.pack flatfileEnvId,
               appFlatfileSecretKey = T.pack flatfileSecretKey,
               appLogFn = logFn,
+              appName = "ffx",
               appOptions = opts,
               appProcessContext = processCtx
             }
