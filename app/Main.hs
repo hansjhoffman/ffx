@@ -63,8 +63,8 @@ programOptions =
       )
     <*> Opts.subparser (initCmd <> publishCmd)
 
-versionOption :: Opts.Parser (a -> a)
-versionOption =
+versionParser :: Opts.Parser (a -> a)
+versionParser =
   Opts.infoOption
     (prettyVersion Meta.version)
     (Opts.long "version" <> Opts.help "Show version")
@@ -75,7 +75,7 @@ versionOption =
 optsParser :: Opts.ParserInfo AppOptions
 optsParser =
   Opts.info
-    (Opts.helper <*> versionOption <*> programOptions)
+    (Opts.helper <*> versionParser <*> programOptions)
     ( Opts.fullDesc
         <> Opts.header "Flatfile 'X' CLI"
         <> Opts.progDesc "Create a starter project and publish your code."
