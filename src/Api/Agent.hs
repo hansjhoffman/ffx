@@ -227,11 +227,14 @@ buildRequest env sourceCode =
       path :: ByteString
       path = T.encodeUtf8 "api/v1/agents"
 
-      flatfileSecretKey :: Text
-      flatfileSecretKey = view flatfileSecretKeyL env
+      flatfileSecretKey :: ByteString
+      flatfileSecretKey = T.encodeUtf8 $ view flatfileSecretKeyL env
 
       envId :: ByteString
       envId = T.encodeUtf8 $ Id.unEnvironmentId (view flatfileEnvIdL env)
+
+      versionString :: ByteString
+      versionString = T.encodeUtf8 $ view nameL env <> " v" <> T.pack (V.showVersion Meta.version)
 
       jsonBody :: J.Value
       jsonBody =
@@ -249,9 +252,9 @@ buildRequest env sourceCode =
           [ ("environmentId", Just envId)
           ]
         $ HTTP.setRequestHeaders
-          [ (Header.hAuthorization, T.encodeUtf8 $ "Bearer " <> flatfileSecretKey),
+          [ (Header.hAuthorization, "Bearer " <> flatfileSecretKey),
             (Header.hContentType, T.encodeUtf8 "application/json"),
-            (Header.hUserAgent, T.encodeUtf8 $ view nameL env <> " v" <> T.pack (V.showVersion Meta.version))
+            (Header.hUserAgent, versionString)
           ]
         $ HTTP.setRequestBodyJSON
           jsonBody

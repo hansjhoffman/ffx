@@ -41,24 +41,26 @@ instance FromJSON Environment where
 
 buildRequest :: App -> EnvironmentId -> Request
 buildRequest env envId =
-  HTTP.setRequestHost host $
-    HTTP.setRequestPort 443 $
-      HTTP.setRequestSecure True $
-        HTTP.setRequestPath path $
-          HTTP.setRequestHeaders
-            [ (Header.hAuthorization, T.encodeUtf8 $ "Bearer " <> flatfileSecretKey),
-              (Header.hUserAgent, T.encodeUtf8 $ view nameL env <> " v" <> T.pack (V.showVersion Meta.version))
-            ]
-            HTTP.defaultRequest
-  where
-    host :: ByteString
-    host = "platform.flatfile.com"
+  let host :: ByteString
+      host = "platform.flatfile.com"
 
-    path :: ByteString
-    path = T.encodeUtf8 $ "api/v1/environments/" <> Id.unEnvironmentId envId
+      path :: ByteString
+      path = T.encodeUtf8 $ "api/v1/environments/" <> Id.unEnvironmentId envId
 
-    flatfileSecretKey :: Text
-    flatfileSecretKey = view flatfileSecretKeyL env
+      flatfileSecretKey :: ByteString
+      flatfileSecretKey = T.encodeUtf8 $ view flatfileSecretKeyL env
+
+      versionString :: ByteString
+      versionString = T.encodeUtf8 $ view nameL env <> " v" <> T.pack (V.showVersion Meta.version)
+   in HTTP.setRequestHost host $
+        HTTP.setRequestPort 443 $
+          HTTP.setRequestSecure True $
+            HTTP.setRequestPath path $
+              HTTP.setRequestHeaders
+                [ (Header.hAuthorization, "Bearer " <> flatfileSecretKey),
+                  (Header.hUserAgent, versionString)
+                ]
+                HTTP.defaultRequest
 
 get :: EnvironmentId -> RIO App (Either JSONException Environment)
 get envId = do
