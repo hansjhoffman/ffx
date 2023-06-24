@@ -92,6 +92,7 @@ common extensions
         PatternGuards
         PolyKinds
         RankNTypes
+        RecordWildCards
         ScopedTypeVariables
         StandaloneDeriving
         TupleSections

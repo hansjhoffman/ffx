@@ -2,7 +2,7 @@ module Main (main) where
 
 import Api.Id (EnvironmentId (..))
 import Data.Version qualified as V
-import Options.Applicative qualified as Opts
+import Options.Applicative
 import Paths_ffx qualified as Meta
 import RIO
 import RIO.Process
@@ -11,80 +11,70 @@ import Run
 import System.Environment (getEnv)
 import Types
 
-initCmd :: Opts.Mod Opts.CommandFields Command
+initCmd :: Mod CommandFields Command
 initCmd =
-  Opts.command
-    "init"
-    ( Opts.info parser $
-        Opts.progDesc "Initialize a Flatfile 'X' configuration project"
-    )
+  command "init" $ info parser (progDesc "Initialize a Flatfile 'X' configuration project")
   where
     parser =
       Init
-        <$> Opts.option
+        <$> option
           templateReader
-          ( Opts.long "template"
-              <> Opts.metavar "<TEMPLATE>"
-              <> Opts.value TypeScript
-              <> Opts.showDefault
-              <> Opts.help "Project template. Either 'javascript', 'typescript', 'local:', 'remote:')"
+          ( long "template"
+              <> metavar "<TEMPLATE>"
+              <> value TypeScript
+              <> showDefault
+              <> help "Project template. Either: 'javascript', 'typescript', 'local:', 'remote:'"
           )
-    templateReader :: Opts.ReadM Template
-    templateReader = Opts.eitherReader $ \case
+    templateReader :: ReadM Template
+    templateReader = eitherReader $ \case
       "javascript" -> Right JavaScript
       "typescript" -> Right TypeScript
       "local:" -> Right (Local "asdf")
       "remote:" -> Right (Remote "asdf")
-      bad -> Left $ "Unknown template: " <> bad
+      bad -> Left $ "Unknown value: " <> bad
 
-publishCmd :: Opts.Mod Opts.CommandFields Command
+publishCmd :: Mod CommandFields Command
 publishCmd =
-  Opts.command
-    "publish"
-    ( Opts.info parser $
-        Opts.progDesc "Publish your configuration to Flatfile"
-    )
+  command "publish" $ info parser (progDesc "Publish your configuration to Flatfile")
   where
     parser =
       Publish
-        <$> Opts.strOption
-          ( Opts.long "file"
-              <> Opts.metavar "<FILE_PATH>"
-              <> Opts.help "Path to CJS file."
+        <$> strOption
+          ( long "file"
+              <> metavar "<FILE_PATH>"
+              <> help "Path to bundled file"
           )
 
-programOptions :: Opts.Parser AppOptions
+programOptions :: Parser AppOptions
 programOptions =
   AppOptions
-    <$> Opts.switch
-      ( Opts.long "debug"
-          <> Opts.short 'd'
-          <> Opts.help "Output information useful for debugging"
+    <$> switch
+      ( long "debug"
+          <> short 'd'
+          <> help "Output information useful for debugging"
       )
-    <*> Opts.subparser (initCmd <> publishCmd)
+    <*> hsubparser (initCmd <> publishCmd)
 
-versionParser :: Opts.Parser (a -> a)
+versionParser :: Parser (a -> a)
 versionParser =
-  Opts.infoOption
+  infoOption
     (prettyVersion Meta.version)
-    (Opts.long "version" <> Opts.help "Show version")
+    (long "version" <> help "Show version")
   where
     prettyVersion :: V.Version -> [Char]
     prettyVersion = (++) "ffx v" . V.showVersion
 
-optsParser :: Opts.ParserInfo AppOptions
+optsParser :: ParserInfo AppOptions
 optsParser =
-  Opts.info
-    (Opts.helper <*> versionParser <*> programOptions)
-    ( Opts.fullDesc
-        <> Opts.header "Flatfile 'X' CLI"
-        <> Opts.progDesc "Create a starter project and publish your code."
-        <> Opts.footer "For more information on ffx, please visit https://foobar.com"
-    )
+  info (helper <*> versionParser <*> programOptions) $
+    fullDesc
+      <> header "Flatfile 'X' CLI"
+      <> progDesc "Create a starter project and publish your code."
+      <> footer "For more information on ffx, please visit https://foobar.com"
 
 main :: IO ()
 main = do
-  opts <- Opts.customExecParser (Opts.prefs Opts.showHelpOnEmpty) optsParser
+  opts <- customExecParser (prefs showHelpOnEmpty) optsParser
   logOpts <- logOptionsHandle stderr $ aoDebug opts
   processCtx <- mkDefaultProcessContext
   flatfileEnvId <- getEnv "FFX_ENV_ID"
