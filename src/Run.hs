@@ -10,6 +10,13 @@ import Prelude (readFile)
 
 -- import System.FilePath ((</>)) -- https://hackage.haskell.org/package/filepath-1.4.100.3/docs/System-FilePath.html
 
+run :: RIO App ()
+run = do
+  env <- ask
+  case aoCommand $ view optsL env of
+    Init template -> init template
+    Publish targetFile -> publish targetFile
+
 init :: Template -> RIO App ()
 init = \case
   JavaScript -> logInfo "JavaScript"
@@ -37,10 +44,3 @@ publish targetFile = do
       Right agent -> do
         logInfo $ "Created Agent: " <> displayShow (Api.Agent.agentId agent)
         logInfo "Done!! 🎉"
-
-run :: RIO App ()
-run = do
-  env <- ask
-  case aoCommand $ view optsL env of
-    Init template -> init template
-    Publish targetFile -> publish targetFile
