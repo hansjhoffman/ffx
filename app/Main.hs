@@ -2,7 +2,7 @@ module Main (main) where
 
 import Api.Id (EnvironmentId (..))
 import Data.Version qualified as V
-import Options.Applicative
+import Options.Applicative qualified as Opt
 import Paths_ffx qualified as Meta
 import RIO
 import RIO.Process
@@ -11,70 +11,70 @@ import Run
 import System.Environment (getEnv)
 import Types
 
-initCmd :: Mod CommandFields Command
+initCmd :: Opt.Mod Opt.CommandFields Command
 initCmd =
-  command "init" $ info parser (progDesc "Initialize a Flatfile 'X' configuration project")
+  Opt.command "init" $ Opt.info parser (Opt.progDesc "Initialize a Flatfile 'X' configuration project")
   where
     parser =
       Init
-        <$> option
+        <$> Opt.option
           templateReader
-          ( long "template"
-              <> metavar "<TEMPLATE>"
-              <> value TypeScript
-              <> showDefault
-              <> help "Project template. Either: 'javascript', 'typescript', 'local:', 'remote:'"
+          ( Opt.long "template"
+              <> Opt.metavar "<TEMPLATE>"
+              <> Opt.value TypeScript
+              <> Opt.showDefault
+              <> Opt.help "Project template. Either: 'javascript', 'typescript', 'local:', 'remote:'"
           )
-    templateReader :: ReadM Template
-    templateReader = eitherReader $ \case
+    templateReader :: Opt.ReadM Template
+    templateReader = Opt.eitherReader $ \case
       "javascript" -> Right JavaScript
       "typescript" -> Right TypeScript
       "local:" -> Right (Local "asdf")
       "remote:" -> Right (Remote "asdf")
       bad -> Left $ "Unknown value: " <> bad
 
-publishCmd :: Mod CommandFields Command
+publishCmd :: Opt.Mod Opt.CommandFields Command
 publishCmd =
-  command "publish" $ info parser (progDesc "Publish your configuration to Flatfile")
+  Opt.command "publish" $ Opt.info parser (Opt.progDesc "Publish your configuration to Flatfile")
   where
     parser =
       Publish
-        <$> strOption
-          ( long "file"
-              <> metavar "<FILE_PATH>"
-              <> help "Path to bundled file"
+        <$> Opt.strOption
+          ( Opt.long "file"
+              <> Opt.metavar "<FILE_PATH>"
+              <> Opt.help "Path to bundled file"
           )
 
-programOptions :: Parser AppOptions
+programOptions :: Opt.Parser AppOptions
 programOptions =
   AppOptions
-    <$> switch
-      ( long "debug"
-          <> short 'd'
-          <> help "Output information useful for debugging"
+    <$> Opt.switch
+      ( Opt.long "debug"
+          <> Opt.short 'd'
+          <> Opt.help "Output information useful for debugging"
       )
-    <*> hsubparser (initCmd <> publishCmd)
+    <*> Opt.hsubparser (initCmd <> publishCmd)
 
-versionParser :: Parser (a -> a)
+versionParser :: Opt.Parser (a -> a)
 versionParser =
-  infoOption
+  Opt.infoOption
     (prettyVersion Meta.version)
-    (long "version" <> help "Show version")
+    (Opt.long "version" <> Opt.help "Show version")
   where
     prettyVersion :: V.Version -> [Char]
     prettyVersion = (++) "ffx v" . V.showVersion
 
-optsParser :: ParserInfo AppOptions
+optsParser :: Opt.ParserInfo AppOptions
 optsParser =
-  info (helper <*> versionParser <*> programOptions) $
-    fullDesc
-      <> header "Flatfile 'X' CLI"
-      <> progDesc "Create a starter project and publish your code."
-      <> footer "For more information on ffx, please visit https://foobar.com"
+  Opt.info (Opt.helper <*> versionParser <*> programOptions) $
+    Opt.fullDesc
+      <> Opt.header "Flatfile 'X' CLI"
+      <> Opt.progDesc "Create a starter project and publish your code."
+      <> Opt.footer "For more information on ffx, please visit https://foobar.com"
 
 main :: IO ()
 main = do
-  opts <- customExecParser (prefs showHelpOnEmpty) optsParser
+  opts <- Opt.customExecParser (Opt.prefs Opt.showHelpOnEmpty) optsParser
   logOpts <- logOptionsHandle stderr $ aoDebug opts
   processCtx <- mkDefaultProcessContext
   flatfileEnvId <- getEnv "FFX_ENV_ID"
